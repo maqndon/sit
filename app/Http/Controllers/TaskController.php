@@ -4,39 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
+use App\Models\Task;
+use App\Services\TaskService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Task;
 
 class TaskController extends Controller
 {
+    protected $taskService;
+
+    public function __construct(TaskService $taskService)
+    {
+        $this->taskService = $taskService;
+    }
+
     /**
      * Display a listing of the resource.
      * 
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $tasks = Task::where('user_id', Auth::id())->get(); // Get tasks for the authenticated user
-        return response()->json([
-            $tasks,
-        ]);
+        $tasks = $this->taskService->getTasks(); // Get tasks for the authenticated user
+        
+        return response()->json($tasks);
     }
 
     /**
      * Store a newly created resource in storage.
      * 
      * @param \App\Http\Requests\StoreTaskRequest $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function store(StoreTaskRequest $request)
+    public function store(StoreTaskRequest $request): JsonResponse
     {
-        $task = Task::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => $request->status,
-            'user_id' => Auth::id(), // Associate the task with the authenticated user
-        ]);
+        $task = $this->taskService->store($request);
 
         return response()->json($task, 201); // Return the created task with a 201 status code
     }
@@ -45,13 +48,11 @@ class TaskController extends Controller
      * Display the specified resource.
      * 
      * @param  \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show(Task $task)
+    public function show(Task $task): JsonResponse
     {
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403); // Check if the user is the owner
-        }
+        $this->taskService->authorizeTask($task); // Check if the user is the owner
 
         return response()->json($task);
     }
@@ -61,32 +62,26 @@ class TaskController extends Controller
      * 
      * @param  App\Http\Requests\UpdateTaskRequest $request
      * @param  \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(UpdateTaskRequest $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403); // Check if the user is the owner
-        }
+        $this->taskService->authorizeTask($task); // Check if the user is the owner
+        $updatedTask = $this->taskService->update($request, $task); // Use the service to update the task
 
-        $task->update($request->only(['title', 'description', 'status']));
-
-        return response()->json($task);
+        return response()->json($updatedTask); // Return the updated task
     }
 
     /**
      * Remove the specified resource from storage.
      * 
      * @param  \App\Models\Task $task
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy(Task $task)
+    public function destroy(Task $task): JsonResponse
     {
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403); // Check if the user is the owner
-        }
-
-        $task->delete();
+        $this->taskService->authorizeTask($task); // Check if the user is the owner
+        $this->taskService->delete($task); // Use the service to delete the task
 
         return response()->json(null, 204); // Return a 204 status code with no content
     }
