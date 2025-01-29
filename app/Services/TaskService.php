@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,7 +33,8 @@ class TaskService
      */
     public function getTasks()
     {
-        return Task::where('user_id', Auth::id())->get();
+        $tasks = Task::where('user_id', Auth::id())->get();
+        return TaskResource::collection($tasks);
     }
 
     /**
