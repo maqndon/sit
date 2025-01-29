@@ -21,7 +21,7 @@ class TaskService
             'title' => $request->title,
             'description' => $request->description,
             'status' => $request->status,
-            'user_id' => Auth::id(), // Associate the task with the authenticated user
+            'user_id' => Auth::id(),  // Associate the task with the authenticated user
         ]);
     }
 
@@ -50,12 +50,12 @@ class TaskService
      * Update a task.
      *
      * @param Task $task
-     * @param StoreTaskRequest $request
+     * @param UpdateTaskRequest $request
      * @return Task
      */
     public function update(UpdateTaskRequest $request, Task $task): Task
     {
-        $task->update($request->validated()); // Update the task with validated data
+        $task->update($request->validated());  // Update the task with validated data
         return $task;
     }
 
@@ -79,7 +79,7 @@ class TaskService
     public function authorizeTask(Task $task): void
     {
         if ($task->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized'); // Check if the user is the owner
+            abort(403, 'Unauthorized');  // Check if the user is the owner
         }
     }
 }
