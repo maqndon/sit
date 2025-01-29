@@ -47,6 +47,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
     /**
      * The tasks that belong to the user.

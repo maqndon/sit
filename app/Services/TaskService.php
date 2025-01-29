@@ -33,7 +33,12 @@ class TaskService
      */
     public function getTasks()
     {
-        $tasks = Task::where('user_id', Auth::id())->get();
+        $user = auth()->user();
+
+        $tasks = Task::when($user->cannot('viewAny', Task::class), function ($query) use ($user) {
+            return $query->where('user_id', $user->id);
+        })->get();
+
         return TaskResource::collection($tasks);
     }
 
