@@ -8,6 +8,7 @@ use App\Models\User;
 trait UserTrait
 {
     protected $user;
+
     protected $task;
 
     public function createUser(): User

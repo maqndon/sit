@@ -12,9 +12,6 @@ class TaskService
 {
     /**
      * Store a new task.
-     *
-     * @param StoreTaskRequest $request
-     * @return Task
      */
     public function store(StoreTaskRequest $request): Task
     {
@@ -45,8 +42,7 @@ class TaskService
     /**
      * Get a specific task by ID.
      *
-     * @param int $id
-     * @return Task
+     * @param  int  $id
      */
     public function getTaskById($id): Task
     {
@@ -55,22 +51,16 @@ class TaskService
 
     /**
      * Update a task.
-     *
-     * @param Task $task
-     * @param UpdateTaskRequest $request
-     * @return Task
      */
     public function update(UpdateTaskRequest $request, Task $task): Task
     {
         $task->update($request->validated());  // Update the task with validated data
+
         return $task;
     }
 
     /**
      * Delete a task.
-     *
-     * @param Task $task
-     * @return void
      */
     public function delete(Task $task): void
     {
@@ -80,7 +70,6 @@ class TaskService
     /**
      * Authorize the user for the given task.
      *
-     * @param Task $task
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorizeTask(Task $task): void

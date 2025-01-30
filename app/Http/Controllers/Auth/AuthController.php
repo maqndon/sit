@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class AuthController extends Controller
 {
     /**
      * Register a new user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function register(Request $request)
@@ -20,13 +19,13 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
         ]);
-        
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -36,13 +35,11 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 201);
-
     }
 
     /**
      * Login a user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
@@ -52,9 +49,9 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (!auth()->attempt($credentials)) {
+        if (! auth()->attempt($credentials)) {
             return response()->json([
-                'message' => 'Invalid login credentials'
+                'message' => 'Invalid login credentials',
             ], 401);
         }
 
@@ -65,13 +62,11 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 201);
-
     }
 
     /**
      * Logout a user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)

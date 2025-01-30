@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Tasks;
 
+use App\Enums\TaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Enums\TaskStatus;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -28,5 +28,5 @@ class StoreTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'status' => ['required', Rule::in(TaskStatus::values())],
         ];
-    }   
+    }
 }
