@@ -32,9 +32,11 @@ class TaskService
     {
         $user = auth()->user();
 
-        $tasks = Task::when($user->cannot('viewAny', Task::class), function ($query) use ($user) {
-            return $query->where('user_id', $user->id);
-        })->get();
+        $tasks = Task::with('user')
+            ->when($user->cannot('viewAny', Task::class), function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
+            })
+            ->get();
 
         return TaskResource::collection($tasks);
     }

@@ -14,11 +14,15 @@ class TaskResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
+
         return [
-            // 'id' =>$this->id,
             'title' => $this->title,
             'description' => $this->description,
             'status' => $this->status,
+            'owner' => $user->can('viewAny', \App\Models\Task::class)
+                ? ['id' => $this->user->id, 'name' => $this->user->name]
+                : 'You',
         ];
     }
 }
