@@ -6,10 +6,23 @@ use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TaskService
 {
+    protected $user;
+
+    public function __construct()
+    {
+        $this->user = auth()->user();
+
+        if (! $this->user) {
+            throw new HttpException(401, 'Unauthenticated.');
+        }
+    }
+
     /**
      * Store a new task.
      */
@@ -25,16 +38,12 @@ class TaskService
 
     /**
      * Get all tasks for the authenticated user.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getTasks()
+    public function getTasks(): ResourceCollection
     {
-        $user = auth()->user();
-
         $tasks = Task::with('user')
-            ->when($user->cannot('viewAny', Task::class), function ($query) use ($user) {
-                return $query->where('user_id', $user->id);
+            ->when($this->user->cannot('viewAny', Task::class), function ($query) {
+                return $query->where('user_id', $this->user->id);
             })
             ->get();
 
@@ -43,12 +52,12 @@ class TaskService
 
     /**
      * Get a specific task by ID.
-     *
-     * @param  int  $id
      */
-    public function getTaskById($id): Task
+    public function getTaskById(Task $task)
     {
-        return Task::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $this->authorizeTask($task);  // Check authorization
+
+        return new TaskResource($task);  // Return the task as a resource
     }
 
     /**
@@ -56,6 +65,8 @@ class TaskService
      */
     public function update(UpdateTaskRequest $request, Task $task): Task
     {
+        $this->authorizeTask($task);  // Check authorization
+
         $task->update($request->validated());  // Update the task with validated data
 
         return $task;
@@ -66,6 +77,8 @@ class TaskService
      */
     public function delete(Task $task): void
     {
+        $this->authorizeTask($task);  // Check authorization
+
         $task->delete();
     }
 
@@ -76,8 +89,14 @@ class TaskService
      */
     public function authorizeTask(Task $task): void
     {
-        if ($task->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');  // Check if the user is the owner
+        // Allow admin users to update any task
+        if ($this->user->role === 'admin') {
+            return;  // Admin can proceed
+        }
+
+        // Check if the user is the owner of the task
+        if ($task->user_id !== $this->user->id) {
+            throw new HttpException(403, 'Unauthorized');
         }
     }
 }
