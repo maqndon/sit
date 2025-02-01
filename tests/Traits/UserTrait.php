@@ -16,6 +16,11 @@ trait UserTrait
         return $this->user = User::factory()->create();
     }
 
+    public function createAdminUser(): User
+    {
+        return $this->user = User::factory()->create(['role' => 'admin']);
+    }
+
     public function createUserWithTask(): User
     {
         $this->user = User::factory()->create();
