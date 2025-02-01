@@ -22,6 +22,7 @@ class TaskFactory extends Factory
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
             'status' => $this->faker->randomElement(TaskStatus::values()),
+            'deadline' => $this->faker->date(),
             'user_id' => User::factory(),
         ];
     }
