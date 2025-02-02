@@ -17,6 +17,18 @@ it('denies unauthenticated users access to tasks', function () {
     $response->assertStatus(401);
 });
 
+it('allows authenticated users to view all projects tasks', function () {
+    // Arrange: Create a user and their tasks
+    $user = $this->createUserWithTask();
+
+    // Act & Assert: Authenticated user can see their tasks
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
+
+    $response
+        ->assertStatus(200)
+        ->assertJsonCount(1);
+});
+
 it('allows authenticated users to view their tasks', function () {
     // Arrange: Create a user and their tasks
     $user = $this->createUserWithTask();
@@ -32,7 +44,11 @@ it('allows authenticated users to view their tasks', function () {
 it('allows authenticated users to create a task', function () {
     // Arrange: Create a user
     $user = $this->createUser();
-    $taskData = ['title' => 'New Task', 'description' => 'Task description', 'status' => 'todo'];
+    $taskData = [
+        'title' => 'New Task',
+        'description' => 'Task description',
+        'status' => 'todo',
+    ];
 
     // Act: The authenticated user creates a new task
     $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', $taskData);
@@ -41,6 +57,8 @@ it('allows authenticated users to create a task', function () {
     $response
         ->assertStatus(201)
         ->assertJsonFragment($taskData);
+
+    $this->assertDatabaseHas('tasks', ['title' => 'New Task']);
 });
 
 it('allows authenticated users to update their task', function () {
@@ -96,14 +114,26 @@ it('denies unauthorized user from deleting a task', function () {
     $response = $this->actingAs($otherUser, 'sanctum')->deleteJson("/api/tasks/{$task->id}");
 
     // Assert: Expect a 403 Forbidden status
-    $response->assertStatus(403);
+    $response->assertForbidden();
+});
+
+it('allows authenticated users to view tasks of a specific project', function () {
+    // Arrange: Create a user with a project and tasks
+    $user = $this->createUserWithProjectAndTasks(3);
+    $project = $user->projects()->first();  // Get the first project of the user
+
+    // Act: The authenticated user requests the tasks of the project
+    $response = $this->actingAs($user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
+
+    // Assert: Verify that the user can see the project's tasks
+    $response->assertStatus(200)->assertJsonCount(3);
 });
 
 it('allows admin users to view all tasks', function () {
     // Arrange: Create an admin user and some tasks for different users
     $adminUser = $this->createAdminUser();
     $user = $this->createUserWithTask();  // Create a regular user with a task
-    $otherTask = Task::factory()->create(['user_id' => $user->id]);  // Create another task for the same user
+    $otherTask = Task::factory()->for($this->user)->create();  // Create another task for the same user
 
     // Act: The admin user retrieves all tasks
     $response = $this->actingAs($adminUser, 'sanctum')->getJson('/api/tasks');

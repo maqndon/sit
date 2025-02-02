@@ -13,8 +13,12 @@ beforeEach(function () {
 
 it('ensures all responses are JSON', function () {
     $endpoints = [
+        'api/login',
+        'api/logout',
+        'api/unauthenticated',
         'api/tasks',
         'api/users',
+        'api/projects',
     ];
 
     foreach ($endpoints as $endpoint) {
