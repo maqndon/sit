@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            ProjectSeeder::class,  // Agregamos proyectos
+            ProjectSeeder::class,
             TaskSeeder::class,
         ]);
     }
