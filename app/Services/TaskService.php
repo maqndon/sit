@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -58,6 +60,29 @@ class TaskService
         $this->authorizeTask($task);  // Check authorization
 
         return new TaskResource($task);  // Return the task as a resource
+    }
+
+    /**
+     * Get a specific task by given User.
+     */
+    public function getTasksByUser(User $user)
+    {
+        $tasks = Task::with('user')
+            ->where('user_id', $user->id)
+            ->with('project')
+            ->get();
+
+        return TaskResource::collection($tasks);
+    }
+
+    /**
+     * Get a specific task by given Project.
+     */
+    public function getTasksByProject(Project $project)
+    {
+        $tasks = Task::where('project_id', $project->id)->get();
+
+        return TaskResource::collection($tasks);
     }
 
     /**
