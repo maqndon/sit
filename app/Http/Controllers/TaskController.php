@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 
@@ -68,5 +70,46 @@ class TaskController extends Controller
         $this->taskService->delete($task);  // Use the service to delete the task
 
         return response()->json(null, 204);  // Return a 204 status code with no content
+    }
+
+    /**
+     * Show tasks by user.
+     */
+    public function showTasksByUser(User $user): JsonResponse
+    {
+        $tasks = $this->taskService->getTasksByUser($user);
+
+        return response()->json(TaskResource::collection($tasks));
+    }
+
+    /**
+     * Show tasks by project.
+     */
+    public function showTasksByProject(Project $project): JsonResponse
+    {
+        $tasks = $this->taskService->getTasksByProject($project);
+
+        return response()->json(TaskResource::collection($tasks));
+    }
+
+    /**
+     * Update task deadline.
+     */
+    public function updateDeadline(Request $request, Task $task): JsonResponse
+    {
+        $this->taskService->authorizeTask($task);
+        $task->update(['deadline' => $request->deadline]);
+
+        return response()->json(new TaskResource($task));
+    }
+
+    /**
+     * Get overdue tasks.
+     */
+    public function getOverdueTasks(): JsonResponse
+    {
+        $tasks = Task::where('deadline', '<', now())->get();
+
+        return response()->json(TaskResource::collection($tasks));
     }
 }
