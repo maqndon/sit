@@ -15,10 +15,10 @@ class UserSeeder extends Seeder
         User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@admin.com',
-            'password' => bcrypt('password'),  // Más seguro
+            'password' => bcrypt('password'),
             'role' => 'admin',
         ]);
 
-        User::factory(10)->create();  // Crea 10 usuarios adicionales
+        User::factory(10)->create();
     }
 }
