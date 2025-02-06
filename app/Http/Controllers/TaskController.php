@@ -9,10 +9,13 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\TaskService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
 class TaskController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $taskService;
 
     public function __construct(TaskService $taskService)
@@ -35,6 +38,8 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request): JsonResponse
     {
+        $this->authorize('create', Task::class);
+
         $task = $this->taskService->store($request);
 
         return response()->json(new TaskResource($task), 201);
@@ -45,7 +50,7 @@ class TaskController extends Controller
      */
     public function show(Task $task): JsonResponse
     {
-        $this->taskService->authorizeTask($task);  // Check if the user is authorized
+        $this->authorize('view', $task);
 
         return response()->json(new TaskResource($task));  // Return the task as a resource
     }
@@ -55,7 +60,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
-        $this->taskService->authorizeTask($task);  // Check if the user is authorized
+        $this->authorize('update', $task);  // Check if the user is authorized
         $updatedTask = $this->taskService->update($request, $task);  // Use the service to update the task
 
         return response()->json(new TaskResource($updatedTask));  // Return the updated task as a resource
@@ -66,7 +71,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task): JsonResponse
     {
-        $this->taskService->authorizeTask($task);  // Check if the user is authorized
+        $this->authorize('delete', $task);  // Check if the user is authorized
         $this->taskService->delete($task);  // Use the service to delete the task
 
         return response()->json(null, 204);  // Return a 204 status code with no content
@@ -77,6 +82,8 @@ class TaskController extends Controller
      */
     public function showTasksByUser(User $user): JsonResponse
     {
+        $this->authorize('viewAny', Task::class);
+
         $tasks = $this->taskService->getTasksByUser($user);
 
         return response()->json(TaskResource::collection($tasks));
@@ -97,7 +104,7 @@ class TaskController extends Controller
      */
     public function updateDeadline(Request $request, Task $task): JsonResponse
     {
-        $this->taskService->authorizeTask($task);
+        $this->updateDeadline('updateDeadline', $task);
         $task->update(['deadline' => $request->deadline]);
 
         return response()->json(new TaskResource($task));

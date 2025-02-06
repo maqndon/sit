@@ -57,8 +57,6 @@ class TaskService
      */
     public function getTaskById(Task $task)
     {
-        $this->authorizeTask($task);  // Check authorization
-
         return new TaskResource($task);  // Return the task as a resource
     }
 
@@ -90,8 +88,6 @@ class TaskService
      */
     public function update(UpdateTaskRequest $request, Task $task): Task
     {
-        $this->authorizeTask($task);  // Check authorization
-
         $task->update($request->validated());  // Update the task with validated data
 
         return $task;
@@ -102,26 +98,6 @@ class TaskService
      */
     public function delete(Task $task): void
     {
-        $this->authorizeTask($task);  // Check authorization
-
         $task->delete();
-    }
-
-    /**
-     * Authorize the user for the given task.
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function authorizeTask(Task $task): void
-    {
-        // Allow admin users to update any task
-        if ($this->user->role === 'admin') {
-            return;  // Admin can proceed
-        }
-
-        // Check if the user is the owner of the task
-        if ($task->user_id !== $this->user->id) {
-            throw new HttpException(403, 'Unauthorized');
-        }
     }
 }

@@ -28,7 +28,7 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -36,7 +36,15 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin() || $task->user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the user can update the deadline.
+     */
+    public function updateDeadline(User $user, Task $task): bool
+    {
+        return $user->isAdmin() || $task->user_id === $user->id;
     }
 
     /**
@@ -44,7 +52,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin() || $task->user_id === $user->id;
     }
 
     /**
