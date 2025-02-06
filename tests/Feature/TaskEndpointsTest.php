@@ -9,12 +9,12 @@ beforeEach(function () {
     $this->refreshDatabase();
 });
 
-it('denies unauthenticated users access to tasks', function () {
+it('denies unauthenticated users access to the endpoint /api/tasks', function () {
     // Act: Try to access tasks without authentication
     $response = $this->getJson('/api/tasks');
 
     // Assert: Ensure it returns 401 Unauthorized
-    $response->assertStatus(401);
+    $response->assertUnauthorized();
 });
 
 it('allows authenticated users to view all projects tasks', function () {
@@ -25,7 +25,7 @@ it('allows authenticated users to view all projects tasks', function () {
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
 
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertJsonCount(1);
 });
 
@@ -37,7 +37,7 @@ it('allows authenticated users to view their tasks', function () {
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
 
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertJsonCount(1);
 });
 
@@ -55,7 +55,7 @@ it('allows authenticated users to create a task', function () {
 
     // Assert: Ensure the task is created successfully
     $response
-        ->assertStatus(201)
+        ->assertCreated()
         ->assertJsonFragment($taskData);
 
     $this->assertDatabaseHas('tasks', ['title' => 'New Task']);
@@ -72,7 +72,7 @@ it('allows authenticated users to update their task', function () {
 
     // Assert: Ensure the task is updated successfully
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertJsonFragment($updatedData);
 });
 
@@ -85,7 +85,7 @@ it('allows authenticated users to delete their task', function () {
     $response = $this->actingAs($user, 'sanctum')->deleteJson("/api/tasks/{$task->id}");
 
     // Assert: Ensure the task is deleted successfully
-    $response->assertStatus(204);
+    $response->assertNoContent($status = 204);
     $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
 });
 
@@ -126,7 +126,7 @@ it('allows authenticated users to view tasks of a specific project', function ()
     $response = $this->actingAs($user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
 
     // Assert: Verify that the user can see the project's tasks
-    $response->assertStatus(200)->assertJsonCount(3);
+    $response->assertOk()->assertJsonCount(3);
 });
 
 it('allows admin users to view all tasks', function () {
@@ -140,7 +140,7 @@ it('allows admin users to view all tasks', function () {
 
     // Assert: Ensure the response is successful and contains the tasks
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertJsonCount(2);  // Assuming there are 2 tasks in total
 });
 
@@ -156,7 +156,7 @@ it('allows admin users to update any task', function () {
 
     // Assert: Ensure the task is updated successfully
     $response
-        ->assertStatus(200)
+        ->assertOk()
         ->assertJsonFragment($updatedData);
 });
 
@@ -170,6 +170,17 @@ it('allows admin users to delete any task', function () {
     $response = $this->actingAs($adminUser, 'sanctum')->deleteJson("/api/tasks/{$task->id}");
 
     // Assert: Ensure the task is deleted successfully
-    $response->assertStatus(204);
+    $response->assertNoContent($status = 204);
     $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+});
+
+it('throws a 404 Status if the task does not exist', function () {
+    // Arrange: Create an user without any task
+    $user = $this->createUser();
+
+    // Act: The admin user deletes the task
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks/1');
+
+    // Assert: Expect a 404 Not Found status
+    $response->assertNotFound();
 });
