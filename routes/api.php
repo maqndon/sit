@@ -3,7 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/unauthenticated', [AuthController::class, 'unauthenticated'])->name('login');
@@ -14,13 +14,13 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::apiResource('users', UserController::class);
 
-    Route::apiResource('tasks', TaskController::class);
+    Route::apiResource('tasks', TaskController::class)
+        ->middleware('task_owner');
 
-    Route::apiResource('projects', ProjectController::class);
+    Route::apiResource('projects', ProjectController::class)
+        ->middleware('project_owner');
 
     // Show tasks by user
     Route::get('users/{user}/tasks', [TaskController::class, 'showTasksByUser'])

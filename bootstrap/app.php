@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureUserOwnsProject;
+use App\Http\Middleware\EnsureUserOwnsTask;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,7 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(ForceJsonResponse::class);
+        $middleware->append([
+            ForceJsonResponse::class,
+        ]);
+        $middleware->alias([
+            'task_owner' => EnsureUserOwnsTask::class,
+            'project_owner' => EnsureUserOwnsProject::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Throwable $e, $request) {
