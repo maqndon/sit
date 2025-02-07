@@ -7,10 +7,13 @@ use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use App\Services\ProjectService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
 class ProjectController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $projectService;
 
     public function __construct(ProjectService $projectService)
@@ -43,6 +46,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project): JsonResponse
     {
+        $this->authorize('viewAny', $project);
+
         $this->projectService->authorizeProject($project);  // Check if the user is authorized
 
         return response()->json(new ProjectResource($project->load('tasks')));
