@@ -41,6 +41,9 @@ class ProjectService
     public function getProjects(): ResourceCollection
     {
         $projects = Project::with('user')
+            ->when($this->user->cannot('viewAny', Project::class), function ($query) {
+                return $query->where('user_id', $this->user->id);
+            })
             ->get();
 
         return ProjectResource::collection($projects);
