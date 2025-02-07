@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Project;
 use App\Models\Task;
 use Tests\Traits\UserTrait;
 
@@ -17,16 +18,15 @@ it('denies unauthenticated users access to the endpoint /api/tasks', function ()
     $response->assertUnauthorized();
 });
 
-it('allows authenticated users to view all projects tasks', function () {
+it('denies authenticated users to view projects tasks', function () {
     // Arrange: Create a user and their tasks
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithProjectAndTasks();
+    $project = Project::first();
 
     // Act & Assert: Authenticated user can see their tasks
-    $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
+    $response = $this->actingAs($user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
 
-    $response
-        ->assertOk()
-        ->assertJsonCount(1);
+    $response->assertForbidden();
 });
 
 it('allows authenticated users to view their tasks', function () {
@@ -117,16 +117,17 @@ it('denies unauthorized user from deleting a task', function () {
     $response->assertForbidden();
 });
 
-it('allows authenticated users to view tasks of a specific project', function () {
+it('denies users to view tasks of another users project', function () {
     // Arrange: Create a user with a project and tasks
     $user = $this->createUserWithProjectAndTasks(3);
+    $another_user = $this->createUser();
     $project = $user->projects()->first();  // Get the first project of the user
 
     // Act: The authenticated user requests the tasks of the project
-    $response = $this->actingAs($user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
+    $response = $this->actingAs($another_user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
 
     // Assert: Verify that the user can see the project's tasks
-    $response->assertOk()->assertJsonCount(3);
+    $response->assertForbidden();
 });
 
 it('allows admin users to view all tasks', function () {
