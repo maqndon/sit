@@ -41,18 +41,19 @@ trait UserTrait
     /**
      * Create a task associated with a user or project.
      */
-    public function createTask(array $attributes = []): Task
+    public function createTask(array $attributes, int $taskCount)
     {
-        return $this->task = Task::factory()->create($attributes);
+        return Task::factory()->count($taskCount)->create($attributes);
     }
 
     /**
      * Create a user with an associated task.
      */
-    public function createUserWithTask(): User
+    public function createUserWithTasks(int $taskCount = 1): User
     {
         $user = $this->createUser();
-        $this->createTask(['user_id' => $user->id]);
+
+        $this->createTask(['user_id' => $user->id], $taskCount);
 
         return $user;
     }
@@ -60,13 +61,14 @@ trait UserTrait
     /**
      * Create a user with an associated task.
      */
-    public function createUserWithOverdueTask(): User
+    public function createUserWithOverdueTask(int $taskCount = 1): User
     {
         $user = $this->createUser();
         $this->createTask([
             'user_id' => $user->id,
             'deadline' => now()->subDays(rand(1, 60)),
-        ]);
+        ],
+            $taskCount);
 
         return $user;
     }
