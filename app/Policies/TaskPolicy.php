@@ -60,7 +60,7 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin() || $task->user_id === $user->id;
     }
 
     /**
@@ -68,6 +68,6 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin() || $task->user_id === $user->id;
     }
 }
