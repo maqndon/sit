@@ -61,6 +61,7 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
         $this->authorize('update', $task);  // Check if the user is authorized
+
         $updatedTask = $this->taskService->update($request, $task);  // Use the service to update the task
 
         return response()->json(new TaskResource($updatedTask));  // Return the updated task as a resource
@@ -72,6 +73,7 @@ class TaskController extends Controller
     public function destroy(Task $task): JsonResponse
     {
         $this->authorize('delete', $task);  // Check if the user is authorized
+
         $this->taskService->delete($task);  // Use the service to delete the task
 
         return response()->json(null, 204);  // Return a 204 status code with no content
@@ -107,6 +109,7 @@ class TaskController extends Controller
     public function updateDeadline(Request $request, Task $task): JsonResponse
     {
         $this->updateDeadline('updateDeadline', $task);
+
         $task->update(['deadline' => $request->deadline]);
 
         return response()->json(new TaskResource($task));
