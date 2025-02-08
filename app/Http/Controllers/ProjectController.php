@@ -36,6 +36,8 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request): JsonResponse
     {
+        $this->authorize('create', Project::class);
+
         $project = $this->projectService->store($request);
 
         return response()->json(new ProjectResource($project), 201);
@@ -58,7 +60,7 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        $this->projectService->authorizeProject($project);
+        $this->authorize('update', $project);
 
         $project = $this->projectService->update($request, $project);
 
@@ -70,16 +72,10 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project): JsonResponse
     {
+        $this->authorize('delete', $project);
+
         $this->projectService->delete($project);
 
         return response()->json(null, 204);
-    }
-
-    /**
-     * Get tasks by project.
-     */
-    public function getTasks(Project $project): JsonResponse
-    {
-        return response()->json($project->tasks);
     }
 }
