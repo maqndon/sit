@@ -17,11 +17,9 @@ class ForceJsonResponse
     {
         $response = $next($request);
 
-        if (! $response instanceof \Illuminate\Http\JsonResponse) {
-            return response()->json([
-                'message' => $response->statusText(),
-            ], $response->status());
-        }
+        return $response instanceof \Illuminate\Http\JsonResponse
+            ? $response
+            : response()->json(['message' => $response->statusText()], $response->status());
 
         return $response;
     }
