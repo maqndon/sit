@@ -2,6 +2,7 @@
 
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Support\Facades\Log;
 use Tests\Traits\UserTrait;
 
 uses(UserTrait::class);
@@ -238,4 +239,19 @@ it('denies users to see another users overdue tasks', function () {
     } else {
         expect($content)->toBeEmpty();
     }
+});
+
+it('triggers the TaskUpdated event and executes the listener', function () {
+    // Arrange
+    Log::shouldReceive('info')->once();
+
+    $user = $this->createUserWithTask();
+    $task = Task::first();
+    $updatedData = ['title' => 'Updated Task Title'];
+
+    // Act
+    $response = $this->actingAs($user, 'sanctum')->patchJson("/api/tasks/{$task->id}", $updatedData);
+
+    // Assert
+    $response->assertOk();
 });

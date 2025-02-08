@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\TaskUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,10 @@ class Task extends Model
         'status',
         'deadline',
         'user_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'updated' => TaskUpdated::class,
     ];
 
     /**
