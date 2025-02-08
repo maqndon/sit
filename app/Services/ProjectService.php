@@ -54,8 +54,6 @@ class ProjectService
      */
     public function getProjectById(Project $project)
     {
-        $this->authorizeProject($project);  // Check authorization
-
         return new ProjectResource($project);  // Return the Project as a resource
     }
 
@@ -64,8 +62,6 @@ class ProjectService
      */
     public function update(UpdateProjectRequest $request, Project $project): Project
     {
-        $this->authorizeProject($project);  // Check authorization
-
         $project->update($request->validated());  // Update the Project with validated data
 
         return $project;
@@ -76,26 +72,6 @@ class ProjectService
      */
     public function delete(Project $project): void
     {
-        $this->authorizeProject($project);  // Check authorization
-
         $project->delete();
-    }
-
-    /**
-     * Authorize the user for the given Project.
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function authorizeProject(Project $project): void
-    {
-        // Allow admin users to update any Project
-        if ($this->user->role === 'admin') {
-            return;  // Admin can proceed
-        }
-
-        // Check if the user is the owner of the Project
-        if ($project->user_id !== $this->user->id) {
-            throw new HttpException(403, 'Unauthorized');
-        }
     }
 }
