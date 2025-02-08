@@ -117,11 +117,11 @@ class TaskController extends Controller
     }
 
     /**
-     * Get overdue tasks.
+     * Show overdue tasks.
      */
-    public function getOverdueTasks(): JsonResponse
+    public function showOverdueTasks(): JsonResponse
     {
-        $tasks = Task::where('deadline', '<', now())->get();
+        $tasks = $this->taskService->getOverdueTasks();  // Get overdue tasks for the authenticated user
 
         return response()->json(TaskResource::collection($tasks));
     }

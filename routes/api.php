@@ -16,6 +16,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('users', UserController::class);
 
+    // Show overdue tasks
+    Route::get('tasks/overdue', [TaskController::class, 'showOverdueTasks']);
+
     Route::apiResource('tasks', TaskController::class)
         ->middleware('task_owner');
 
@@ -29,10 +32,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Show tasks by project
     Route::get('projects/{project}/tasks', [TaskController::class, 'showTasksByProject'])
         ->where('project', '[0-9]+');
-
-    // Show overdue tasks
-    Route::get('tasks/overdue', [TaskController::class, 'showOverdueTasks'])
-        ->middleware(EnsureUserCanEditOverdueTask::class);
 
     // Update only the deadline of a task
     Route::patch('tasks/{task}/deadline', [TaskController::class, 'updateDeadline']);

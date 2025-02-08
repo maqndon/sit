@@ -58,6 +58,20 @@ trait UserTrait
     }
 
     /**
+     * Create a user with an associated task.
+     */
+    public function createUserWithOverdueTask(): User
+    {
+        $user = $this->createUser();
+        $this->createTask([
+            'user_id' => $user->id,
+            'deadline' => now()->subDays(rand(1, 60)),
+        ]);
+
+        return $user;
+    }
+
+    /**
      * Create a user with an associated project.
      */
     public function createUserWithProject(): User

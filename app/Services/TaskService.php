@@ -54,6 +54,22 @@ class TaskService
     }
 
     /**
+     * Get all tasks for the authenticated user.
+     */
+    public function getOverdueTasks(): ResourceCollection
+    {
+        $tasks = Task::with('user')
+            ->when($this->user->cannot('viewAny', Task::class), function ($query) {
+                return $query
+                    ->where('user_id', $this->user->id)
+                    ->where('deadline', '<', now());
+            })
+            ->get();
+
+        return TaskResource::collection($tasks);
+    }
+
+    /**
      * Get a specific task by ID.
      */
     public function getTaskById(Task $task)

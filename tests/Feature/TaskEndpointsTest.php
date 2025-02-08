@@ -193,7 +193,8 @@ it('allows the task owner to update the task deadline', function () {
     $updatedDeadline = ['deadline' => now()->addDay()->toDateTimeString()];
 
     // Act: The task owner updates the deadline
-    $response = $this->actingAs($user, 'sanctum')
+    $response = $this
+        ->actingAs($user, 'sanctum')
         ->patchJson("/api/tasks/{$task->id}/deadline", $updatedDeadline);
 
     // Assert: Ensure the task is updated successfully
@@ -206,4 +207,35 @@ it('allows the task owner to update the task deadline', function () {
         'id' => $task->id,
         'deadline' => $updatedDeadline['deadline'],
     ]);
+});
+
+it('allows users to see their overdue tasks', function () {
+    // Arrange: Create a user and an overdue task for that user
+    $user = $this->createUserWithOverdueTask();
+
+    // Act: User tries to see their overdue tasks
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks/overdue');
+
+    // Assert: User can see their overdue task
+    $response->assertOk();
+});
+
+it('denies users to see another users overdue tasks', function () {
+    // Arrange: Create a user and an overdue task for that user
+    $user = $this->createUserWithOverdueTask();
+    $user_without_task = $this->createUser();
+
+    // Act: User tries to see their overdue tasks
+    $response = $this->actingAs($user_without_task, 'sanctum')->getJson('/api/tasks/overdue');
+
+    // Assert: User can access the endpoint but sees no tasks
+    $response->assertOk();
+
+    $content = $response->json();
+
+    if (isset($content['data'])) {
+        expect($content['data'])->toBeEmpty();
+    } else {
+        expect($content)->toBeEmpty();
+    }
 });
