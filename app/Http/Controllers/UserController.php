@@ -61,6 +61,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
         $this->authorize('update', $user);  // Check if the user is authorized
+
         $updatedUser = $this->userService->update($request, $user);  // Use the service to update the user
 
         return response()->json(new UserResource($updatedUser));  // Return the updated user as a resource
@@ -72,6 +73,7 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         $this->authorize('delete', $user);  // Check if the user is authorized
+
         $this->userService->delete($user);  // Use the service to delete the user
 
         return response()->json(null, 204);  // Return a 204 status code with no content
