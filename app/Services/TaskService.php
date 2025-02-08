@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\Tasks\StoreTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskDeadlineRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
@@ -92,6 +93,16 @@ class TaskService
     public function update(UpdateTaskRequest $request, Task $task): Task
     {
         $task->update($request->validated());  // Update the task with validated data
+
+        return $task;
+    }
+
+    /**
+     * Update the deadline of a task.
+     */
+    public function updateDeadline(UpdateTaskDeadlineRequest $request, Task $task): Task
+    {
+        $task->update($request->validated());
 
         return $task;
     }

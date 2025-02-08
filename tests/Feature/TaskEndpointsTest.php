@@ -179,9 +179,31 @@ it('throws a 404 Status if the task does not exist', function () {
     // Arrange: Create an user without any task
     $user = $this->createUser();
 
-    // Act: The admin user deletes the task
+    // Act: The user try to access a task that does not exist
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks/1');
 
     // Assert: Expect a 404 Not Found status
     $response->assertNotFound();
+});
+
+it('allows the task owner to update the task deadline', function () {
+    // Arrange: Create a user with a task
+    $user = $this->createUserWithTask();
+    $task = $user->tasks()->first();
+    $updatedDeadline = ['deadline' => now()->addDay()->toDateTimeString()];
+
+    // Act: The task owner updates the deadline
+    $response = $this->actingAs($user, 'sanctum')
+        ->patchJson("/api/tasks/{$task->id}/deadline", $updatedDeadline);
+
+    // Assert: Ensure the task is updated successfully
+    $response
+        ->assertOk()
+        ->assertJsonFragment($updatedDeadline);
+
+    // Verify in the database
+    $this->assertDatabaseHas('tasks', [
+        'id' => $task->id,
+        'deadline' => $updatedDeadline['deadline'],
+    ]);
 });

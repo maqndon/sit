@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Tasks\StoreTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskDeadlineRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
@@ -106,11 +107,11 @@ class TaskController extends Controller
     /**
      * Update task deadline.
      */
-    public function updateDeadline(Request $request, Task $task): JsonResponse
+    public function updateDeadline(UpdateTaskDeadlineRequest $request, Task $task): JsonResponse
     {
-        $this->updateDeadline('updateDeadline', $task);
+        $this->authorize('updateDeadline', $task);
 
-        $task->update(['deadline' => $request->deadline]);
+        $this->taskService->updateDeadline($request, $task);
 
         return response()->json(new TaskResource($task));
     }
