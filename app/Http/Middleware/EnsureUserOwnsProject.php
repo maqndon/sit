@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Models\Project;
+use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Closure;
 
 class EnsureUserOwnsProject
 {
@@ -26,11 +26,11 @@ class EnsureUserOwnsProject
         $project = $request->route('project');
 
         // Ensure we have a valid Task model
-        if (!$project instanceof Project) {
+        if (! $project instanceof Project) {
             $project = Project::find($project);
         }
 
-        if (!$project) {
+        if (! $project) {
             return response()->json(['message' => 'Project not found'], 404);
         }
 

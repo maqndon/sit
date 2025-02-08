@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Models\Task;
+use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Closure;
 
 class EnsureUserOwnsTask
 {
@@ -17,7 +17,7 @@ class EnsureUserOwnsTask
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
-        
+
         // Skip validation for creating a new task or listing all tasks
         if ($request->isMethod('post') || $request->routeIs('tasks.index')) {
             return $next($request);
@@ -26,11 +26,11 @@ class EnsureUserOwnsTask
         $task = $request->route('task');
 
         // Ensure we have a valid Task model
-        if (!$task instanceof Task) {
+        if (! $task instanceof Task) {
             $task = Task::find($task);
         }
 
-        if (!$task) {
+        if (! $task) {
             return response()->json(['message' => 'Task not found'], 404);
         }
 
