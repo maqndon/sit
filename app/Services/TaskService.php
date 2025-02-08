@@ -82,7 +82,6 @@ class TaskService
             ->where('project_id', $project->id)
             ->with('project')
             ->get();
-        // $tasks = Task::where('project_id', $project->id)->get();
 
         return TaskResource::collection($tasks);
     }
