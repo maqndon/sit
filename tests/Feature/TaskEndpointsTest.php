@@ -32,7 +32,7 @@ it('denies authenticated users to view projects tasks', function () {
 
 it('allows authenticated users to view their tasks', function () {
     // Arrange: Create a user and their tasks
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
 
     // Act & Assert: Authenticated user can see their tasks
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
@@ -64,7 +64,7 @@ it('allows authenticated users to create a task', function () {
 
 it('allows authenticated users to update their task', function () {
     // Arrange: Create a user and a task
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
     $task = Task::first();  // Get the created task
     $updatedData = ['title' => 'Updated Task', 'description' => 'Updated description'];
 
@@ -79,7 +79,7 @@ it('allows authenticated users to update their task', function () {
 
 it('allows authenticated users to delete their task', function () {
     // Arrange: Create a user and a task
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
     $task = Task::first();  // Get the created task
 
     // Act: The authenticated user deletes the task
@@ -107,7 +107,7 @@ it('returns 422 for invalid task creation', function () {
 
 it('denies unauthorized user from deleting a task', function () {
     // Arrange: Create a user with a task and another user
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
     $otherUser = $this->createUser();  // Another user
     $task = Task::first();  // Get the first task
 
@@ -134,7 +134,7 @@ it('denies users to view tasks of another users project', function () {
 it('allows admin users to view all tasks', function () {
     // Arrange: Create an admin user and some tasks for different users
     $adminUser = $this->createAdminUser();
-    $user = $this->createUserWithTask();  // Create a regular user with a task
+    $user = $this->createUserWithTasks();  // Create a regular user with a task
     $otherTask = Task::factory()->for($this->user)->create();  // Create another task for the same user
 
     // Act: The admin user retrieves all tasks
@@ -149,7 +149,7 @@ it('allows admin users to view all tasks', function () {
 it('allows admin users to update any task', function () {
     // Arrange: Create an admin user and a task for a regular user
     $adminUser = $this->createAdminUser();
-    $user = $this->createUserWithTask();  // Create a regular user with a task
+    $user = $this->createUserWithTasks();  // Create a regular user with a task
     $task = Task::first();  // Get the created task
     $updatedData = ['title' => 'Admin Updated Task', 'description' => 'Updated by admin'];
 
@@ -165,7 +165,7 @@ it('allows admin users to update any task', function () {
 it('allows admin users to delete any task', function () {
     // Arrange: Create an admin user and a task for a regular user
     $adminUser = $this->createAdminUser();
-    $user = $this->createUserWithTask();  // Create a regular user with a task
+    $user = $this->createUserWithTasks();  // Create a regular user with a task
     $task = Task::first();  // Get the created task
 
     // Act: The admin user deletes the task
@@ -189,7 +189,7 @@ it('throws a 404 Status if the task does not exist', function () {
 
 it('allows the task owner to update the task deadline', function () {
     // Arrange: Create a user with a task
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
     $task = $user->tasks()->first();
     $updatedDeadline = ['deadline' => now()->addDay()->toDateTimeString()];
 
@@ -245,7 +245,7 @@ it('triggers the TaskUpdated event and executes the listener', function () {
     // Arrange
     Log::shouldReceive('info')->once();
 
-    $user = $this->createUserWithTask();
+    $user = $this->createUserWithTasks();
     $task = Task::first();
     $updatedData = ['title' => 'Updated Task Title'];
 
