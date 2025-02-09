@@ -30,7 +30,7 @@ class UserService
         return User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'pasword' => $request->password,
+            'password' => $request->password,
         ]);
     }
 
