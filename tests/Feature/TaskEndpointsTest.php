@@ -19,7 +19,7 @@ it('denies unauthenticated users access to the endpoint /api/tasks', function ()
     $response->assertUnauthorized();
 });
 
-it('denies authenticated users to view projects tasks', function () {
+it('allows authenticated users to view their projects tasks', function () {
     // Arrange: Create a user and their tasks
     $user = $this->createUserWithProjectAndTasks();
     $project = Project::first();
@@ -27,19 +27,19 @@ it('denies authenticated users to view projects tasks', function () {
     // Act & Assert: Authenticated user can see their tasks
     $response = $this->actingAs($user, 'sanctum')->getJson("/api/projects/{$project->id}/tasks");
 
-    $response->assertForbidden();
+    $response->assertOk();
 });
 
 it('allows authenticated users to view their tasks', function () {
     // Arrange: Create a user and their tasks
-    $user = $this->createUserWithTasks();
+    $user = $this->createUserWithTasks(5);
 
     // Act & Assert: Authenticated user can see their tasks
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/tasks');
 
     $response
         ->assertOk()
-        ->assertJsonCount(1);
+        ->assertJsonCount(5);
 });
 
 it('allows authenticated users to create a task', function () {

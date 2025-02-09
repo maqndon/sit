@@ -33,9 +33,9 @@ trait UserTrait
     /**
      * Create a project associated with a user.
      */
-    public function createProject(array $attributes = []): Project
+    public function createProject(array $attributes, int $projectCount)
     {
-        return $this->project = Project::factory()->create($attributes);
+        return Project::factory()->count($projectCount)->create($attributes);
     }
 
     /**
@@ -76,10 +76,10 @@ trait UserTrait
     /**
      * Create a user with an associated project.
      */
-    public function createUserWithProject(): User
+    public function createUserWithProjects(int $projectCount = 1): User
     {
         $user = $this->createUser();
-        $this->createProject(['user_id' => $user->id]);
+        $this->createProject(['user_id' => $user->id], $projectCount);
 
         return $user;
     }
@@ -90,7 +90,9 @@ trait UserTrait
     public function createUserWithProjectAndTasks(int $taskCount = 1): User
     {
         $user = $this->createUser();
-        $project = $this->createProject(['user_id' => $user->id]);
+        $projectCount = 1;
+        $project = $this->createProject(['user_id' => $user->id], $projectCount);
+        $project = $project->first(); // first from the collection
 
         Task::factory($taskCount)->create(['user_id' => $user->id, 'project_id' => $project->id]);
 

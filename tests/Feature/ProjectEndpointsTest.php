@@ -19,7 +19,7 @@ it('denies unauthenticated users access to /api/projects', function () {
 
 it('allows authenticated users to view their projects', function () {
     // Arrange: Create a user and their projects
-    $user = $this->createUserWithProject();
+    $user = $this->createUserWithProjects(5);
 
     // Act & Assert: Authenticated user can see their projects
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/projects');
@@ -27,7 +27,7 @@ it('allows authenticated users to view their projects', function () {
     // Assert:Ensure it returns 200
     $response
         ->assertOk()
-        ->assertJsonCount(1);
+        ->assertJsonCount(5);
 });
 
 it('allows authenticated users to create a project', function () {
@@ -49,7 +49,7 @@ it('allows authenticated users to create a project', function () {
 
 it('allows authenticated users to update their Project', function () {
     // Arrange: Create a user and a Project
-    $user = $this->createUserWithProject();
+    $user = $this->createUserWithProjects();
     $project = Project::latest()->first();  // Get the last created Project
     $updatedData = [
         'name' => 'Updated Name',
@@ -67,7 +67,7 @@ it('allows authenticated users to update their Project', function () {
 
 it('allows authenticated users to delete their project', function () {
     // Arrange: Create a user and a Project
-    $user = $this->createUserWithProject();
+    $user = $this->createUserWithProjects();
     $project = Project::first();  // Get the created project
 
     // Act: The authenticated user deletes the Project
@@ -95,7 +95,7 @@ it('returns 422 for invalid Project creation', function () {
 
 it('denies unauthorized user from deleting a Project', function () {
     // Arrange: Create a user with a Project and another user
-    $user = $this->createUserWithProject();
+    $user = $this->createUserWithProjects();
     $otherUser = $this->createUser();  // Another user
     $project = Project::first();  // Get the first Project
 
@@ -109,7 +109,7 @@ it('denies unauthorized user from deleting a Project', function () {
 it('allows admin users to view all projects', function () {
     // Arrange: Create an admin user and another user with projects
     $adminUser = $this->createAdminUser();
-    $this->createUserWithProject();  // A user with a project
+    $this->createUserWithProjects();  // A user with a project
 
     // Act: The admin user retrieves all projects
     $response = $this->actingAs($adminUser, 'sanctum')->getJson('/api/projects');
@@ -123,7 +123,7 @@ it('allows admin users to view all projects', function () {
 it('allows admin users to update any Project', function () {
     // Arrange: Create an admin user and a Project for a regular user
     $adminUser = $this->createAdminUser();
-    $user = $this->createUserWithProject();  // Create a regular user with a Project
+    $user = $this->createUserWithProjects();  // Create a regular user with a Project
     $project = Project::first();  // Get the created Project
     $updatedData = [
         'name' => 'Admin Updated Project',
@@ -142,7 +142,7 @@ it('allows admin users to update any Project', function () {
 it('allows admin users to delete any Project', function () {
     // Arrange: Create an admin user and a Project for a regular user
     $adminUser = $this->createAdminUser();
-    $user = $this->createUserWithProject();  // Create a regular user with a Project
+    $user = $this->createUserWithProjects(5);  // Create a regular user with a Project
     $project = Project::first();  // Get the created Project
 
     // Act: The admin user deletes the Project
