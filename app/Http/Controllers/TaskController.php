@@ -97,7 +97,7 @@ class TaskController extends Controller
      */
     public function showTasksByProject(Project $project): JsonResponse
     {
-        $this->authorize('viewAny', Task::class);
+        $this->authorize('viewProjectTasks', $project);
 
         $tasks = $this->taskService->getTasksByProject($project);
 

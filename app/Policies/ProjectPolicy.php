@@ -24,6 +24,14 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can view the model.
+     */
+    public function viewProjectTasks(User $user, Project $project): bool
+    {
+        return $user->isAdmin() || $project->user_id === $user->id;
+    }
+
+    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool
