@@ -18,11 +18,11 @@ class TaskResource extends JsonResource
 
         return [
             'title' => $this->title,
-            'project' => new ProjectSummaryResource($this->whenLoaded('project')),
             'description' => $this->description,
             'status' => $this->status,
             'deadline' => $this->deadline,
             'owner' => new UserSummaryResource($this->whenLoaded('user')),
+            'project' => new ProjectSummaryResource($this->whenLoaded('project')),
         ];
     }
 }
