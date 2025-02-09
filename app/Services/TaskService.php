@@ -44,7 +44,7 @@ class TaskService
      */
     public function getTasks(): ResourceCollection
     {
-        $tasks = Task::with('user')
+        $tasks = Task::with(['project', 'user'])
             ->when($this->user->cannot('viewAny', Task::class), function ($query) {
                 return $query->where('user_id', $this->user->id);
             })
@@ -58,7 +58,7 @@ class TaskService
      */
     public function getOverdueTasks(): ResourceCollection
     {
-        $tasks = Task::with('user')
+        $tasks = Task::with(['user', 'project'])
             ->when($this->user->cannot('viewAny', Task::class), function ($query) {
                 return $query
                     ->where('user_id', $this->user->id)
