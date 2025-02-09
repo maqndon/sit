@@ -1,7 +1,7 @@
 <?php
 
-use Tests\Traits\UserTrait;
 use Illuminate\Support\Facades\DB;
+use Tests\Traits\UserTrait;
 
 uses(UserTrait::class);
 
@@ -58,7 +58,20 @@ it('avoids N+1 queries on projects endpoint', function () {
 
     // Assert: Check the number of queries executed
     $queries = DB::getQueryLog(); // Get the executed queries
-    expect(count($queries))->toBeLessThan(10); // Adjust according to the endpoint
+    expect(count($queries))->toBeLessThan(5); // Adjust according to the endpoint
+});
+
+it('avoids N+1 queries on overdue tasks endpoint', function () {
+    // Arrange: Enable query logging and create a user with a project
+    DB::enableQueryLog(); // Enable SQL query logging
+    $user = $this->createUserWithTasks();
+
+    // Act: Make a request to the projects endpoint
+    $this->actingAs($user, 'sanctum')->getJson('/api/tasks/overdue');
+
+    // Assert: Check the number of queries executed
+    $queries = DB::getQueryLog(); // Get the executed queries
+    expect(count($queries))->toBeLessThan(5); // Adjust according to the endpoint
 });
 
 it('does not consume excessive memory', function () {
