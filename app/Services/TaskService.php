@@ -59,12 +59,13 @@ class TaskService
     public function getOverdueTasks(): ResourceCollection
     {
         $tasks = Task::with(['user', 'project'])
+            ->where('deadline', '<', now())
+            ->where('status', '!=', 'done')
             ->when($this->user->cannot('viewAny', Task::class), function ($query) {
-                return $query
-                    ->where('user_id', $this->user->id)
-                    ->where('deadline', '<', now());
+                return $query->where('user_id', $this->user->id);
             })
-            ->get();
+            ->orderBy('deadline', 'asc')
+            ->paginate(50);
 
         return TaskResource::collection($tasks);
     }
