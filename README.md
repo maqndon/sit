@@ -67,26 +67,54 @@ This table stores task information and includes the following fields:
 - `created_at` (Timestamp): When the task was created.
 - `updated_at` (Timestamp): When the task was last updated.
 
+### Projects Table
+This table stores project information and includes the following fields:
+- `id` (Primary Key): Auto-incrementing unique identifier.
+- `user_id` (foreignId): The user unique identifier.
+- `name` (String): The title of the project, maximum 255 characters.
+- `description` (Text): A detailed description of the project.
+- `created_at` (Timestamp): When the project was created.
+- `updated_at` (Timestamp): When the project was last updated.
+
 ## Usage
 
-This API allows users to manage tasks with the following features:
+This API allows users to manage tasks, projects and users with the following features:
+
 - Create tasks
 - Read tasks
 - Update tasks
 - Delete tasks
+
+- Create projects
+- Read projects
+- Update projects
+- Delete projects
+
+- Create users
+- Read users
+- Update users
+- Delete users
 
 Refer to the documentation below for detailed API endpoints and request examples.
 
 ## API Documentation
 The API follows RESTful principles. Below is a summary of the available endpoints:
 
-| Method | Endpoint           | Description              |
-|--------|--------------------|--------------------------|
-| GET    | `/api/tasks`       | List all tasks           |
-| POST   | `/api/tasks`       | Create a new task        |
-| GET    | `/api/tasks/{id}`  | Get details of a task    |
-| PUT    | `/api/tasks/{id}`  | Update an existing task  |
-| DELETE | `/api/tasks/{id}`  | Delete a task            |
+| Method | Endpoint                        | Description                 |
+|--------|---------------------------------|-----------------------------|
+| GET    | `/api/tasks`                    | List all tasks              |
+| GET    | `/api/tasks/overdue`            | List all overdue tasks      |
+| POST   | `/api/tasks`                    | Create a new task           |
+| GET    | `/api/tasks/{task}`             | Get details of a task       |
+| PUT    | `/api/tasks/{task}`             | Update an existing task     |
+| PATCH  | `/api/tasks/{task}/deadline`    | Update the task's deadline  |
+| DELETE | `/api/tasks/{task}`             | Delete a task               |
+| GET    | `/api/projects`                 | List all projects           |
+| GET    | `/api/projects/{project}/tasks` | List all task's projects    |
+| POST   | `/api/projects`                 | Create a new project        |
+| GET    | `/api/projects/{project}`       | Get details of a project    |
+| PUT    | `/api/projects/{project}`       | Update an existing project  |
+| DELETE | `/api/projects/{project}`       | Delete a project            |
 
 > Note: All requests require authentication. See the authentication section for details.
 
@@ -175,6 +203,98 @@ curl --location --request DELETE "http://127.0.0.1:8000/api/tasks/56" ^
 **Delete a Task (Linux/Mac):**
 ```bash
 curl --location --request DELETE 'http://127.0.0.1:8000/api/tasks/56' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get All Projects (Windows):**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get All Projects (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get a Specific Project (Windows)**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get a Specific Project (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Create a Project (Windows)**
+```bash
+curl --location --request POST "http://127.0.0.1:8000/api/projects" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--form "name=\"New Project\"" ^
+--form "description=\"Project description\""
+```
+
+**Create a Project (Linux/Mac)**
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/projects' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--form 'name="New Project"' \
+--form 'description="Project description"'
+```
+
+**Update a Project (Windows)**
+```bash
+curl --location --request PUT "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--data-urlencode "name=Updated Project Name" ^
+--data-urlencode "description=Updated project description"
+```
+
+**Update a Project (Linux/Mac)**
+```bash
+curl --location --request PUT 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--data-urlencode 'name=Updated Project Name' \
+--data-urlencode 'description=Updated project description'
+```
+
+**Delete a Project (Windows)**
+```bash
+curl --location --request DELETE "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Delete a Project (Linux/Mac)**
+```bash
+curl --location --request DELETE 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get Tasks from a Specific Project (Windows)**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects/1/tasks" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get Tasks from a Specific Project (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects/1/tasks' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer the_token_from_login'
 ```
