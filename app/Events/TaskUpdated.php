@@ -12,6 +12,8 @@ class TaskUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $task;
+
     /**
      * Create a new event instance.
      */
@@ -28,7 +30,7 @@ class TaskUpdated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('task.'.$this->task->id),
         ];
     }
 }
