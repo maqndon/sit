@@ -2,7 +2,9 @@
 
 use App\Models\Project;
 use App\Models\Task;
+use App\Notifications\TaskOverdueNotification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Tests\Traits\UserTrait;
 
 uses(UserTrait::class);
@@ -242,16 +244,23 @@ it('denies users to see another users overdue tasks', function () {
 });
 
 it('triggers the TaskUpdated event and executes the listener', function () {
-    // Arrange
-    Log::shouldReceive('info')->once();
+    // Arrange: Prepare the test
+    Log::shouldReceive('info')->once();  // Expect the Log::info method to be called once
 
-    $user = $this->createUserWithTasks();
+    // Create a user and task
+    $user = $this->createUserWithOverdueTask();
     $task = Task::first();
     $updatedData = ['title' => 'Updated Task Title'];
 
-    // Act
+    // Fake the notification sending
+    Notification::fake();
+
+    // Act: Update the task
     $response = $this->actingAs($user, 'sanctum')->patchJson("/api/tasks/{$task->id}", $updatedData);
 
-    // Assert
+    // Assert: Verify the response is OK
     $response->assertOk();
+
+    // Verify that the notification was sent
+    Notification::assertSentTo($user, TaskOverdueNotification::class);
 });

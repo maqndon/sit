@@ -5,6 +5,7 @@ namespace Tests\Traits;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Arr;
 
 trait UserTrait
 {
@@ -66,6 +67,7 @@ trait UserTrait
         $user = $this->createUser();
         $this->createTask([
             'user_id' => $user->id,
+            'status' => (Arr::random(['todo', 'in_progress'])),
             'deadline' => now()->subDays(rand(1, 60)),
         ],
             $taskCount);
