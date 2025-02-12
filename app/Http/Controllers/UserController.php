@@ -14,7 +14,7 @@ class UserController extends Controller
 {
     use AuthorizesRequests;
 
-    protected $userService;
+    protected UserService $userService;
 
     public function __construct(UserService $userService)
     {

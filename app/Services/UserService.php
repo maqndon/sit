@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserService
 {
-    protected $user;
+    protected User $user;
 
     public function __construct()
     {
@@ -53,7 +53,7 @@ class UserService
     /**
      * Get a specific task by ID.
      */
-    public function getUserById(User $task)
+    public function getUserById(User $task): UserResource
     {
         return new UserResource($task);  // Return the task as a resource
     }

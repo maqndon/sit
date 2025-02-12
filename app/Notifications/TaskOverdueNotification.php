@@ -11,7 +11,7 @@ class TaskOverdueNotification extends Notification
 {
     use Queueable;
 
-    protected $task;
+    protected Task $task;
 
     /**
      * Create a new notification instance.
