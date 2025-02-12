@@ -2,20 +2,21 @@
 
 namespace App\Services;
 
-use App\Http\Requests\Tasks\StoreTaskRequest;
-use App\Http\Requests\Tasks\UpdateTaskDeadlineRequest;
-use App\Http\Requests\Tasks\UpdateTaskRequest;
-use App\Http\Resources\TaskResource;
-use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Models\Project;
+use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use App\Http\Requests\Tasks\StoreTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskDeadlineRequest;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TaskService
 {
-    protected $user;
+    protected User $user;
 
     public function __construct()
     {
@@ -45,7 +46,7 @@ class TaskService
     public function getTasks(): ResourceCollection
     {
         $tasks = Task::with(['project', 'user'])
-            ->when($this->user->cannot('viewAny', Task::class), function ($query) {
+            ->when($this->user->cannot('viewAny', Task::class), function (Builder $query):Builder{
                 return $query->where('user_id', $this->user->id);
             })
             ->get();
@@ -61,7 +62,7 @@ class TaskService
         $tasks = Task::with(['user', 'project'])
             ->where('deadline', '<', now())
             ->where('status', '!=', 'done')
-            ->when($this->user->cannot('viewAny', Task::class), function ($query) {
+            ->when($this->user->cannot('viewAny', Task::class), function (Builder $query):Builder {
                 return $query->where('user_id', $this->user->id);
             })
             ->orderBy('deadline', 'asc')
@@ -73,7 +74,7 @@ class TaskService
     /**
      * Get a specific task by ID.
      */
-    public function getTaskById(Task $task)
+    public function getTaskById(Task $task): TaskResource
     {
         return new TaskResource($task);  // Return the task as a resource
     }
@@ -81,7 +82,7 @@ class TaskService
     /**
      * Get a specific task by given User.
      */
-    public function getTasksByUser(User $user)
+    public function getTasksByUser(User $user): ResourceCollection
     {
         $tasks = Task::with('user')
             ->where('user_id', $user->id)
@@ -94,7 +95,7 @@ class TaskService
     /**
      * Get a specific task by given Project.
      */
-    public function getTasksByProject(Project $project)
+    public function getTasksByProject(Project $project): ResourceCollection
     {
         $tasks = Task::with('user')
             ->where('project_id', $project->id)

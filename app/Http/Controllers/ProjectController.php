@@ -14,7 +14,7 @@ class ProjectController extends Controller
 {
     use AuthorizesRequests;
 
-    protected $projectService;
+    protected ProjectService $projectService;
 
     public function __construct(ProjectService $projectService)
     {

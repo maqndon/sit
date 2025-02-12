@@ -17,7 +17,7 @@ class TaskController extends Controller
 {
     use AuthorizesRequests;
 
-    protected $taskService;
+    protected TaskService $taskService;
 
     public function __construct(TaskService $taskService)
     {

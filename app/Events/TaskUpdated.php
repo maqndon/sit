@@ -12,7 +12,7 @@ class TaskUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $task;
+    public Task $task;
 
     /**
      * Create a new event instance.
