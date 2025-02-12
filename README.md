@@ -1,66 +1,329 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Task Management API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository contains the implementation of a RESTful API for a simple task management system, developed using Laravel. The project follows best practices for structure, readability, and documentation.
 
-## About Laravel
+## Installation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Follow the steps below to set up the project:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/maqndon/sit.git
+   cd sit
+   ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. **Install Dependencies**
+   Ensure you have [Composer](https://getcomposer.org/) installed.
+   ```bash
+   composer install
+   ```
 
-## Learning Laravel
+3. **Environment Configuration**
+   Copy the `.env.example` file and configure your environment settings:
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your database credentials and other environment variables.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+4. **Generate Application Key**
+   ```bash
+   php artisan key:generate
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+5. **Run Migrations**
+   Set up the database structure by running the migrations:
+   ```bash
+   php artisan migrate
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+7. **Seed the Database**
+   Optionally, seed the database with sample data for manual testing:
+   ```bash
+   php artisan db:seed
+   ```
+   To run a specific seeder, such as the `TaskSeeder`:
+   ```bash
+   php artisan db:seed --class=TaskSeeder
+   ```
 
-## Laravel Sponsors
+8. **Run the Development Server**
+   Start the Laravel development server:
+   ```bash
+   php artisan serve
+   ```
+   The application will be available at `http://127.0.0.1:8000`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Database Structure
 
-### Premium Partners
+The database for this project includes the following structure:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Tasks Table
+This table stores task information and includes the following fields:
+- `id` (Primary Key): Auto-incrementing unique identifier.
+- `title` (String): The title of the task, maximum 255 characters.
+- `description` (Text): A detailed description of the task.
+- `status` (Enum): The current status of the task. Values: `todo`, `in_progress`, `done`.
+- `user_id` (foreignId): The user unique identifier.
+- `created_at` (Timestamp): When the task was created.
+- `updated_at` (Timestamp): When the task was last updated.
+
+### Projects Table
+This table stores project information and includes the following fields:
+- `id` (Primary Key): Auto-incrementing unique identifier.
+- `user_id` (foreignId): The user unique identifier.
+- `name` (String): The title of the project, maximum 255 characters.
+- `description` (Text): A detailed description of the project.
+- `created_at` (Timestamp): When the project was created.
+- `updated_at` (Timestamp): When the project was last updated.
+
+## Usage
+
+This API allows users to manage tasks, projects and users with the following features:
+
+- Create tasks
+- Read tasks
+- Update tasks
+- Delete tasks
+
+- Create projects
+- Read projects
+- Update projects
+- Delete projects
+
+- Create users
+- Read users
+- Update users
+- Delete users
+
+Refer to the documentation below for detailed API endpoints and request examples.
+
+## API Documentation
+The API follows RESTful principles. Below is a summary of the available endpoints:
+
+| Method | Endpoint                        | Description                 |
+|--------|---------------------------------|-----------------------------|
+| GET    | `/api/tasks`                    | List all tasks              |
+| GET    | `/api/tasks/overdue`            | List all overdue tasks      |
+| POST   | `/api/tasks`                    | Create a new task           |
+| GET    | `/api/tasks/{task}`             | Get details of a task       |
+| PUT    | `/api/tasks/{task}`             | Update an existing task     |
+| PATCH  | `/api/tasks/{task}/deadline`    | Update the task's deadline  |
+| DELETE | `/api/tasks/{task}`             | Delete a task               |
+| GET    | `/api/projects`                 | List all projects           |
+| GET    | `/api/projects/{project}/tasks` | List all task's projects    |
+| POST   | `/api/projects`                 | Create a new project        |
+| GET    | `/api/projects/{project}`       | Get details of a project    |
+| PUT    | `/api/projects/{project}`       | Update an existing project  |
+| DELETE | `/api/projects/{project}`       | Delete a project            |
+
+> Note: All requests require authentication. See the authentication section for details.
+
+### Authentication
+To test the API manually, you can use the following credentials:
+- **Email**: `admin@admin.com`
+- **Password**: `password`
+
+#### Login Example
+
+**cURL (Windows):**
+```bash
+curl --location --request POST "http://127.0.0.1:8000/api/login" ^
+--header "Accept: application/json" ^
+--form "email=\"admin@admin.com\"" ^
+--form "password=\"password\""
+```
+
+**cURL (Linux/Mac):**
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/login' \
+--header 'Accept: application/json' \
+--form 'email="admin@admin.com"' \
+--form 'password="password"'
+```
+
+#### Example Requests
+
+**Get All Tasks (Windows):**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/tasks" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get All Tasks (Linux/Mac):**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/tasks' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Create a Task (Windows):**
+```bash
+curl --location --request POST "http://127.0.0.1:8000/api/tasks" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--form "title=\"test1\"" ^
+--form "description=\"description1\"" ^
+--form "status=\"todo\""
+```
+
+**Create a Task (Linux/Mac):**
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/tasks' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--form 'title="test1"' \
+--form 'description="description1"' \
+--form 'status="todo"'
+```
+
+**Update a Task (Windows):**
+```bash
+curl --location --request PUT "http://127.0.0.1:8000/api/tasks/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--data-urlencode "title=updated title"
+```
+
+**Update a Task (Linux/Mac):**
+```bash
+curl --location --request PUT 'http://127.0.0.1:8000/api/tasks/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--data-urlencode 'title=updated title'
+```
+
+**Delete a Task (Windows):**
+```bash
+curl --location --request DELETE "http://127.0.0.1:8000/api/tasks/56" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Delete a Task (Linux/Mac):**
+```bash
+curl --location --request DELETE 'http://127.0.0.1:8000/api/tasks/56' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get All Projects (Windows):**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get All Projects (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get a Specific Project (Windows)**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get a Specific Project (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Create a Project (Windows)**
+```bash
+curl --location --request POST "http://127.0.0.1:8000/api/projects" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--form "name=\"New Project\"" ^
+--form "description=\"Project description\""
+```
+
+**Create a Project (Linux/Mac)**
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/projects' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--form 'name="New Project"' \
+--form 'description="Project description"'
+```
+
+**Update a Project (Windows)**
+```bash
+curl --location --request PUT "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login" ^
+--data-urlencode "name=Updated Project Name" ^
+--data-urlencode "description=Updated project description"
+```
+
+**Update a Project (Linux/Mac)**
+```bash
+curl --location --request PUT 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login' \
+--data-urlencode 'name=Updated Project Name' \
+--data-urlencode 'description=Updated project description'
+```
+
+**Delete a Project (Windows)**
+```bash
+curl --location --request DELETE "http://127.0.0.1:8000/api/projects/1" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Delete a Project (Linux/Mac)**
+```bash
+curl --location --request DELETE 'http://127.0.0.1:8000/api/projects/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get Tasks from a Specific Project (Windows)**
+```bash
+curl --location --request GET "http://127.0.0.1:8000/api/projects/1/tasks" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Get Tasks from a Specific Project (Linux/Mac)**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/projects/1/tasks' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+**Logout (Windows):**
+```bash
+curl --location --request POST "http://127.0.0.1:8000/api/logout" ^
+--header "Accept: application/json" ^
+--header "Authorization: Bearer the_token_from_login"
+```
+
+**Logout (Linux/Mac):**
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/logout' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer the_token_from_login'
+```
+
+## Tests
+
+Run the Pest tests to ensure all functionality is working as expected:
+```bash
+php artisan test
+```
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Feel free to fork the repository and submit pull requests. Make sure your changes follow Laravel best practices.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-source and available under the [MIT license](LICENSE).
