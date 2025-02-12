@@ -76,6 +76,31 @@ This table stores project information and includes the following fields:
 - `created_at` (Timestamp): When the project was created.
 - `updated_at` (Timestamp): When the project was last updated.
 
+## Implementation Details
+
+- **Input Task Validation**:
+
+  1. **Title and Description**:
+     - The maximum length of the title is 255 characters.
+     - Both title and description are required.
+  
+  2. **Status**:
+     - The status can only take specific values: "todo", "in_progress", and "done".
+  
+  3. **Deadline**:
+     - The deadline is a valid date if is set in the future.
+
+- **Project Details**:
+  - The project is built using **Laravel 11**.
+  - **Pint** has been used to format the code, with the 'laravel' preset.
+  - **Sanctum** has been implemented for API token authentication, allowing secure user authentication and authorization.
+  - The results of the endpoints are paginated for better performance and usability.
+  - A controller, service, requests (for update and store), and policies have been created for each model.
+  - A trait has been implemented to create users with tasks and projects for testing purposes.
+  - Enums have been implemented for `TaskStatus` and `User  Roles`.
+  - Tests have been implemented using **Pest** with Describe Blocks for better organization and readability of test cases.
+  - The requests that a user can make to the API are not restricted.
+
 ## Usage
 
 This API allows users to manage tasks, projects and users with the following features:
@@ -150,11 +175,27 @@ curl --location --request GET "http://127.0.0.1:8000/api/tasks" ^
 --header "Authorization: Bearer the_token_from_login"
 ```
 
+**Get All Tasks (Paginated) (Windows):**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/tasks?page=2' ^
+--header 'Authorization: Bearer Bearer the_token_from_login' ^
+--header 'Accept: application/json" ^
+--header 'Connection: keep-alive'
+```
+
 **Get All Tasks (Linux/Mac):**
 ```bash
 curl --location --request GET 'http://127.0.0.1:8000/api/tasks' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer the_token_from_login'
+```
+
+**Get All Tasks (Paginated) (Linux/Mac):**
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/api/tasks?page=2' \
+--header 'Authorization: Bearer Bearer the_token_from_login' \
+--header 'Accept: application/json" \
+--header 'Connection: keep-alive'
 ```
 
 **Create a Task (Windows):**
