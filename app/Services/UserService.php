@@ -41,7 +41,7 @@ class UserService
     {
         // Check if the authenticated user can view any users
         if ($this->user->can('viewAny', User::class)) {
-            $users = User::all();
+            $users = User::paginate(50);
         } else {
             // If they cannot, return only the authenticated user's data
             $users = User::where('id', $this->user->id)->get();

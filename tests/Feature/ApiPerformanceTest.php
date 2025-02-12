@@ -45,7 +45,7 @@ it('avoids N+1 queries on tasks endpoint', function () {
 
     // Assert: Check the number of queries executed
     $queries = DB::getQueryLog(); // Get the executed queries
-    expect(count($queries))->toBeLessThan(5); // Adjust according to the endpoint
+    expect(count($queries))->toBeLessThan(6); // Adjust according to the endpoint
 });
 
 it('avoids N+1 queries on projects endpoint', function () {
@@ -58,7 +58,7 @@ it('avoids N+1 queries on projects endpoint', function () {
 
     // Assert: Check the number of queries executed
     $queries = DB::getQueryLog(); // Get the executed queries
-    expect(count($queries))->toBeLessThan(5); // Adjust according to the endpoint
+    expect(count($queries))->toBeLessThan(6); // Adjust according to the endpoint
 });
 
 it('avoids N+1 queries on overdue tasks endpoint', function () {

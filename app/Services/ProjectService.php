@@ -44,7 +44,7 @@ class ProjectService
             ->when($this->user->cannot('viewAny', Project::class), function ($query) {
                 return $query->where('user_id', $this->user->id);
             })
-            ->get();
+            ->paginate(50);
 
         return ProjectResource::collection($projects);
     }

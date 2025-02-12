@@ -48,7 +48,7 @@ class TaskService
             ->when($this->user->cannot('viewAny', Task::class), function ($query) {
                 return $query->where('user_id', $this->user->id);
             })
-            ->get();
+            ->paginate(50);
 
         return TaskResource::collection($tasks);
     }
@@ -86,7 +86,7 @@ class TaskService
         $tasks = Task::with('user')
             ->where('user_id', $user->id)
             ->with('project')
-            ->get();
+            ->paginate(50);
 
         return TaskResource::collection($tasks);
     }
@@ -99,7 +99,7 @@ class TaskService
         $tasks = Task::with('user')
             ->where('project_id', $project->id)
             ->with('project')
-            ->get();
+            ->paginate(50);
 
         return TaskResource::collection($tasks);
     }
