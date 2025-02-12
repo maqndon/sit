@@ -64,6 +64,72 @@ it('allows authenticated users to create a task', function () {
     $this->assertDatabaseHas('tasks', ['title' => 'New Task']);
 });
 
+it('validates that status only allows specific values', function () {
+    // Arrange: Create a user
+    $user = $this->createUser();
+
+    // Act: The authenticated user attempts to create a task with an invalid status
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', [
+        'title' => 'Valid title',
+        'description' => 'Task description',
+        'status' => 'invalid_status', // Invalid status
+    ]);
+
+    // Assert: Expect a 422 Unprocessable Entity status and a JSON structure for errors
+    $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
+});
+
+it('validates that title cannot exceed max length', function () {
+    // Arrange: Create a user
+    $user = $this->createUser();
+
+    // Act: The authenticated user attempts to create a task with an overly long title
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', [
+        'title' => str_repeat('A', 300), // Exceeds max length
+        'description' => 'Task description',
+        'status' => 'todo',
+    ]);
+
+    // Assert: Expect a 422 Unprocessable Entity status and a JSON structure for errors
+    $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
+});
+
+it('validates that the title is required', function () {
+    // Arrange: Create a user
+    $user = $this->createUser();
+
+    // Act: The authenticated user attempts to create a task without a title
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', [
+        'title' => '', // Empty title
+        'description' => 'Valid description',
+        'status' => 'todo',
+    ]);
+
+    // Assert: Ensure the response indicates a validation error for the title
+    $response->assertStatus(422)->assertJsonStructure([
+        'message',
+        'errors' => ['title'], // Validation error for the title
+    ]);
+});
+
+it('validates that the description is required', function () {
+    // Arrange: Create a user
+    $user = $this->createUser();
+
+    // Act: The authenticated user attempts to create a task without a description
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', [
+        'title' => 'Valid title',
+        'description' => '', // Empty description
+        'status' => 'todo',
+    ]);
+
+    // Assert: Ensure the response indicates a validation error for the description
+    $response->assertStatus(422)->assertJsonStructure([
+        'message',
+        'errors' => ['description'], // Validation error for the description
+    ]);
+});
+
 it('allows authenticated users to update their task', function () {
     // Arrange: Create a user and a task
     $user = $this->createUserWithTasks();
@@ -90,21 +156,6 @@ it('allows authenticated users to delete their task', function () {
     // Assert: Ensure the task is deleted successfully
     $response->assertNoContent($status = 204);
     $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
-});
-
-it('returns 422 for invalid task creation', function () {
-    // Arrange: Create a user
-    $user = $this->createUser();
-
-    // Act: The authenticated user attempts to create a task with invalid data
-    $response = $this->actingAs($user, 'sanctum')->postJson('/api/tasks', [
-        'title' => '',  // Empty title
-        'description' => 'Task description',
-        'status' => 'invalid_status',  // Invalid status
-    ]);
-
-    // Assert: Expect a 422 Unprocessable Entity status and a JSON structure for errors
-    $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
 });
 
 it('denies unauthorized user from deleting a task', function () {
@@ -212,6 +263,20 @@ it('allows the task owner to update the task deadline', function () {
     ]);
 });
 
+it('validates that the deadline is in the future', function () {
+    // Arrange: Create a user with tasks
+    $user = $this->createUserWithTasks();
+    $task = Task::first();
+
+    // Act: Attempt to update the task with a past deadline
+    $response = $this->actingAs($user, 'sanctum')->putJson("/api/tasks/{$task->id}", [
+        'deadline' => now()->subDay()->toDateTimeString(), // Past deadline
+    ]);
+
+    // Assert: Ensure validation errors are returned
+    $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
+});
+
 it('allows users to see their overdue tasks', function () {
     // Arrange: Create a user and an overdue task for that user
     $user = $this->createUserWithOverdueTask();
@@ -264,3 +329,4 @@ it('triggers the TaskUpdated event and executes the listener', function () {
     // Verify that the notification was sent
     Notification::assertSentTo($user, TaskOverdueNotification::class);
 });
+
