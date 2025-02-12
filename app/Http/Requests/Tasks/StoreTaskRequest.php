@@ -26,8 +26,8 @@ class StoreTaskRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'project_id' => 'nullable|int',
-            'description' => 'nullable|string',
-            'deadline' => 'nullable|date',
+            'description' => 'required|string',
+            'deadline' => 'nullable|date|after_or_equal:today',
             'status' => ['required', Rule::in(TaskStatus::values())],
         ];
     }
