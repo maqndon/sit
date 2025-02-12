@@ -329,4 +329,3 @@ it('triggers the TaskUpdated event and executes the listener', function () {
     // Verify that the notification was sent
     Notification::assertSentTo($user, TaskOverdueNotification::class);
 });
-
