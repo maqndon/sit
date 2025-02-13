@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProjectResource;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\Projects\StoreProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
-use App\Http\Resources\ProjectResource;
-use App\Models\Project;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProjectService
 {
-    protected $user;
+    protected User $user;
 
     public function __construct()
     {
@@ -41,7 +43,7 @@ class ProjectService
     public function getProjects(): ResourceCollection
     {
         $projects = Project::with('user')
-            ->when($this->user->cannot('viewAny', Project::class), function ($query) {
+            ->when($this->user->cannot('viewAny', Project::class), function (Builder $query):Builder {
                 return $query->where('user_id', $this->user->id);
             })
             ->get();
@@ -52,7 +54,7 @@ class ProjectService
     /**
      * Get a specific Project by ID.
      */
-    public function getProjectById(Project $project)
+    public function getProjectById(Project $project): ProjectResource
     {
         return new ProjectResource($project);  // Return the Project as a resource
     }
