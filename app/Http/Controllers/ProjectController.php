@@ -50,8 +50,6 @@ class ProjectController extends Controller
     {
         $this->authorize('viewAny', $project);
 
-        $this->projectService->authorizeProject($project);  // Check if the user is authorized
-
         return response()->json(new ProjectResource($project->load('tasks')));
     }
 
