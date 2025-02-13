@@ -53,26 +53,27 @@ class UserService
     /**
      * Get a specific task by ID.
      */
-    public function getUserById(User $task): UserResource
+    public function getUserById(User $user): UserResource
+
     {
-        return new UserResource($task);  // Return the task as a resource
+        return new UserResource($user);  // Return the task as a resource
     }
 
     /**
      * Update a task.
      */
-    public function update(UpdateUserRequest $request, User $task): User
+    public function update(UpdateUserRequest $request, User $user): User
     {
-        $task->update($request->validated());  // Update the task with validated data
+        $user->update($request->validated());  // Update the task with validated data
 
-        return $task;
+        return $user;
     }
 
     /**
      * Delete a task.
      */
-    public function delete(User $task): void
+    public function delete(User $user): void
     {
-        $task->delete();
+        $user->delete();
     }
 }
